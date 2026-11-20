@@ -1,4 +1,4 @@
-﻿BETA 2 FEATURE STATUS
+BETA 2 FEATURE STATUS
 
 Available in the tested Windows 0.3.1 Beta 2:
 - Numeric manual pitch timeline, 64 regions; not a graphical piano roll.
@@ -6,10 +6,9 @@ Available in the tested Windows 0.3.1 Beta 2:
 - Windows offline stem companion; synthetic-audio inference test passed.
 - All previous Beta 1 processing, presets and UI features.
 
-Shared source includes pitch edits and LUFS for the Mac AU.
-Mac release requires remote compilation, signing checks, Apple auval and
-plugin host tests. The current Mac build is still pending validation.
-The workflow attaches the AU ZIP to the Beta 2 release only after passing.
+Mac universal AU: compilation, architecture and signature checks, Apple
+auval and plugin host tests passed. The Mac ZIP is attached to Beta 2.
+Pitch edits and LUFS are included in both platform builds.
 
 Stem processing runs on Windows. Transfer the four finished WAVs to Mac.
 There is no in-plugin realtime AI separation engine and no Mac AI install.
