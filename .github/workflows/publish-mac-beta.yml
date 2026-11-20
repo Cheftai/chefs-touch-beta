@@ -1,0 +1,25 @@
+name: Attach validated Mac beta
+
+on:
+  workflow_run:
+    workflows: [Build Logic Pro Audio Unit]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish-mac:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Attach validated AU ZIP to Beta 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BUILD_RUN: ${{ github.event.workflow_run.id }}
+        run: |
+          gh run download "$BUILD_RUN" --name Chefs-Touch-Logic-Pro-AU --dir mac-beta
+          gh release upload v0.3.0-beta.1 mac-beta/ChefsTouch-*-macOS-Universal-AU.zip --clobber
