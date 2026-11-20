@@ -63,14 +63,21 @@ if $install; then
     trap rollback EXIT
     mv "$staging/Chefs Touch.component" "$destination"
 
+    # A fresh CI machine may have started its AU registry before installation.
+    # Restart the per-user registrar so it scans the newly installed component.
+    touch "$components"
+    killall AudioComponentRegistrar 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c 'Print :AudioComponents' "$plist"
+    /usr/bin/auval -a
+
     validated=false
-    for attempt in 1 2 3; do
+    for attempt in 1 2 3 4 5; do
         if /usr/bin/auval -v aufx CfTc ChTi >"$build/auval.log" 2>&1 \
             && grep -q 'AU VALIDATION SUCCEEDED' "$build/auval.log"; then
             validated=true
             break
         fi
-        if [[ "$attempt" -lt 3 ]]; then sleep 2; fi
+        if [[ "$attempt" -lt 5 ]]; then sleep 2; fi
     done
     cat "$build/auval.log"
     "$validated"
