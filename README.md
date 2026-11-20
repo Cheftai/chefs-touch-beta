@@ -9,7 +9,7 @@ Vocal processing and stereo mastering in one plugin, with 22 factory presets and
 | Platform | Format | Status |
 | --- | --- | --- |
 | Windows 64-bit | VST3 | Available in the Beta 1 release; compilation and existing host tests passed |
-| Mac M1 and other Apple silicon; Intel | Audio Unit, macOS 12+ | Remote build and validation in progress; download pending |
+| Mac M1 and other Apple silicon; Intel | Audio Unit, macOS 12+ | Available in Beta 2; universal build, Apple AU validation and plugin host tests passed |
 
 This is a private beta. Testers must be invited to this repository and accept the invitation before accessing downloads. The intended first cohort is 25 people. **Plugin activation does not currently enforce a 25-person limit.**
 
@@ -21,7 +21,7 @@ This is a private beta. Testers must be invited to this repository and accept th
 
 ## Install on an M1 Mac with limited storage
 
-Wait for a validated Mac AU download to appear in the release. Download and extract that ZIP, then move `Chefs Touch.component` into `~/Library/Audio/Plug-Ins/Components` with your DAW closed. Create the folder if necessary, restart the DAW and rescan plugins. Delete the downloaded ZIP after installation.
+Download `ChefsTouch-0.3.1-macOS-Universal-AU.zip` from the Beta 2 release and extract it, then move `Chefs Touch.component` into `~/Library/Audio/Plug-Ins/Components` with your DAW closed. Create the folder if necessary, restart the DAW and rescan plugins. Delete the downloaded ZIP after installation.
 
 **You do not need Xcode, JUCE, CMake or this source repository on your Mac.** GitHub builds the plugin remotely. The intended Mac build includes native arm64 and Intel support. It is ad-hoc signed; Apple notarization is not included.
 
@@ -39,7 +39,7 @@ Both processing modes report approximately 25 ms latency. Vocal pitch correction
 
 ## Beta 2 additions and remaining work
 
-Beta 2 adds a numeric manual pitch region editor and output LUFS metering to the shared plugin code. Stem separation uses an offline Windows companion; transfer finished WAV stems to Mac. See [Beta 2 instructions](Beta/BETA-2-READ-ME.txt). The Windows stem engine passed end-to-end inference on a synthetic audio fixture; musical quality still needs listening evaluation. Signed installers, Apple notarization, automatic updates and enforced tester activation are **not included**. No AAX or standalone application is included. A Mac download is only ready after its build and validation succeed.
+Beta 2 adds a numeric manual pitch region editor and output LUFS metering to the shared plugin code. Stem separation uses an offline Windows companion; transfer finished WAV stems to Mac. See [Beta 2 instructions](Beta/BETA-2-READ-ME.txt). The Windows stem engine passed end-to-end inference on a synthetic audio fixture; musical quality still needs listening evaluation. Signed installers, Apple notarization, automatic updates and enforced tester activation are **not included**. No AAX or standalone application is included. The Beta 2 Mac AU has passed remote compilation, signature verification, Apple auval and plugin host validation.
 
 ## Help test the beta
 
