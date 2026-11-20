@@ -1,0 +1,45 @@
+CHEF'S TOUCH 0.3.0 - BETA 1 - November 20, 2026
+First cohort: 25 testers. No license enforcement or download limit.
+
+WINDOWS INSTALL
+Extract the ZIP. Copy the entire Chefs Touch.vst3 folder into
+C:\Program Files\Common Files\VST3 then rescan plugins in your DAW.
+Use a duplicate project for beta evaluation.
+
+INCLUDED
+Vocal and Master modes; 22 presets covering Trap, Pop, Rock, R&B,
+Hip Hop, Acoustic, EDM and Jazz Soul plus the original six recipes.
+Natural/Hard Lock pitch correction, key/scale, retune, humanize,
+tune amount; rumble filtering and three-band noise expansion;
+three-band EQ, compression, de-esser, saturation, reverb, delay;
+input/output gain, wet/dry, stereo width, estimated true-peak limiting.
+DAW tempo sync: Settings > Delay Sync; 1/16 through 1/2, dotted options.
+If the DAW supplies no tempo, the manual delay time is used.
+Input/output and gain reduction meters; pitch display; bypass with
+latency compensation; Standard/High quality; preset save/load;
+beat file BPM/key estimation; mix coach; DAW state recall.
+Kitchen tile background, brass trim and decorative flame border.
+Chef vocal-level mouth animation and in-tune celebration.
+
+LIMITATIONS / STILL NEEDED
+No word recognition, phoneme lip sync, lyric display, stem separation,
+formant control, manual note editing, MIDI note control, automatic
+DAW-tempo delay sync, LUFS metering, AAX or standalone application.
+Noise cleanup is expansion, not AI source separation.
+Peak ceiling estimation has no broadcast certification.
+Mac AU must be built and validated on GitHub before distributing it.
+No signed Windows installer, Apple notarization, update service,
+tester access control or automatic crash/feedback collection.
+Flames are decorative; background is drawn kitchen tiles, not artwork.
+Presets need listening evaluation on real recordings in each genre.
+
+TEST REPORT
+Send OS, CPU, DAW/version, sample rate, buffer size, preset, steps to
+reproduce, expected/actual behavior, and screenshots or short audio
+when possible. Check loading, UI resizing, automation, save/reopen,
+bypass timing, silence, loud sections, mono/stereo and CPU use.
+
+VALIDATION
+Windows Release compiled; existing VST3 host validation passed.
+No Mac build or cross-DAW listening evaluation completed here.
+

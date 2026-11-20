@@ -1,0 +1,31 @@
+CHEF'S TOUCH - START HERE
+
+Everything to upload is in this folder. Build tools and the large JUCE
+checkout are intentionally excluded: CMake fetches pinned JUCE on GitHub.
+The Beta folder contains the already-tested Windows VST3 ZIP.
+
+GITHUB SETUP (use your Cheftai account)
+1. Open https://github.com/new and sign in.
+2. Repository name: chefs-touch-beta. Choose Private for your 25 testers.
+3. Leave README, .gitignore and license initialization unchecked.
+4. Click Create repository.
+5. Right-click Setup-GitHub.ps1 > Run with PowerShell.
+   The script initializes ONLY this launch folder and pushes its files.
+   Git may open a browser to sign in. Complete GitHub authentication.
+6. On GitHub open Actions > Build Logic Pro Audio Unit > Run workflow.
+   The Mac is built remotely; your M1 needs no build tools or source.
+7. After a passing run, download Chefs-Touch-Logic-Pro-AU from Artifacts.
+8. On the repository page choose Releases > Draft a new release.
+   Tag: v0.3.0-beta.1. Title: Chef's Touch Beta 1.
+   Mark it as a prerelease. Attach Beta's Windows ZIP and the Mac AU ZIP.
+   Publish only after the Mac workflow has passed if advertising both OSes.
+9. Settings > Collaborators: invite your 25 testers using their GitHub names.
+   They must accept before they can see a private repository/release.
+
+Private repo collaborators can see the source as well as downloads.
+There is no 25-download limit, activation code or license server.
+For binary-only sharing, use a separate private repository for releases.
+
+See Beta/BETA-READ-ME.txt for installation, features, limitations and tests.
+See MAC-TRANSFER.txt for installing only the plugin on your Mac.
+The Mac binary is not built yet. Windows ZIP is ready.

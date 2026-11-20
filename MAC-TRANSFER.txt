@@ -1,0 +1,19 @@
+M1 MAC TRANSFER - BUILD ON GITHUB, NOT YOUR MAC
+
+Extract ChefsTouch-Source-Transfer.zip on Windows. Upload its contents,
+including .github, to a private GitHub repository at the repository root.
+Go to Actions > Build Logic Pro Audio Unit > Run workflow.
+After a successful run download the Chefs-Touch-Logic-Pro-AU artifact.
+On Mac extract the downloaded ZIP and the AU ZIP inside it.
+Move Chefs Touch.component to ~/Library/Audio/Plug-Ins/Components
+(Create that folder if necessary.) Restart Logic or GarageBand.
+Delete the downloaded archives after installation to recover space.
+No Xcode, CMake, JUCE or source checkout is needed on your Mac.
+The workflow builds universal arm64 + Intel AU and validates it.
+The Mac build has not been run from this Windows workspace.
+The component is ad-hoc signed, not Apple notarized.
+
+22 presets: six original recipes plus Vocal and Master recipes for
+Trap, Pop, Rock, R&B, Hip Hop, Acoustic, EDM, Jazz Soul.
+Choose your song key and scale; adjust levels to the actual recording.
+Mouth animation responds to vocal level; it does not recognize lyrics.

@@ -1,0 +1,11 @@
+Chef's Touch Beta 1
+
+Windows VST3 with Vocal/Master chains and 22 factory presets.
+Kitchen tile UI, flame trim, vocal-responsive chef, DAW-tempo delay sync.
+Windows Release compiled and existing plugin host validation passed.
+Mac AU requires a successful GitHub Actions Mac validation run.
+
+This beta does not include manual pitch editing, stem separation,
+LUFS meters, code signing/notarization, automatic updates or runtime
+activation. Private repository access controls downloads only.
+See the attached beta readme for features, installation and known limits.

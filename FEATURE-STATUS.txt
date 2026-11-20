@@ -1,0 +1,18 @@
+REQUESTED NEXT FEATURES - STATUS
+
+Tempo-synced delay: implemented; Windows build and existing host tests passed. Host-specific tempo behavior still needs DAW testing.
+Manual pitch timeline/editor: not implemented.
+Stem separation: not implemented; requires separation engine/model and
+an offline import/export workflow, plus model licensing review.
+LUFS metering: not implemented.
+Signed installers: blocked by missing signing certificates.
+Apple notarization: blocked by missing Apple Developer membership.
+Automatic updates: not implemented; requires published release hosting,
+verification of downloaded packages and an installer/update strategy.
+25-user runtime activation: not implemented; requires tester identities,
+license signing keys and an activation/revocation design.
+Private GitHub collaboration limits access to downloads, not copied binaries.
+
+Do not advertise these requested features as included in Beta 1.
+Do not advertise Mac support as tested until the Mac workflow passes.
+
