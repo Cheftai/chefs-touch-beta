@@ -1,0 +1,6 @@
+﻿Build/
+third_party/
+.stem-tools/
+.vs/
+.DS_Store
+*.user
