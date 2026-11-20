@@ -1,8 +1,8 @@
-﻿# Chef's Touch — Beta 1
+# Chef's Touch — Beta 1
 
 Vocal processing and stereo mastering in one plugin, with 22 factory presets and a chef mascot that reacts to your vocal.
 
-**[Download Beta 1](https://github.com/Cheftai/chefs-touch-beta/releases/tag/v0.3.0-beta.1)** · **[Mac build status](https://github.com/Cheftai/chefs-touch-beta/actions)** · **[Report a bug](https://github.com/Cheftai/chefs-touch-beta/issues)**
+**[Download Beta 1 (previous)](https://github.com/Cheftai/chefs-touch-beta/releases/tag/v0.3.0-beta.1)** · **[Mac build status](https://github.com/Cheftai/chefs-touch-beta/actions)** · **[Report a bug](https://github.com/Cheftai/chefs-touch-beta/issues)**
 
 ## Downloads and compatibility
 
@@ -39,7 +39,7 @@ Both processing modes report approximately 25 ms latency. Vocal pitch correction
 
 ## Requested features still to come
 
-Manual pitch editing, stem separation, LUFS metering, signed installers, Apple notarization, automatic updates and enforced tester activation are **not included**. No AAX or standalone application is included. A Mac download is only ready after its build and validation succeed.
+Beta 2 adds a numeric manual pitch region editor and output LUFS metering to the shared plugin code. Stem separation uses an offline Windows companion; transfer finished WAV stems to Mac. See [Beta 2 instructions](Beta/BETA-2-READ-ME.txt). The stem engine has not been tested end-to-end here. Signed installers, Apple notarization, automatic updates and enforced tester activation are **not included**. No AAX or standalone application is included. A Mac download is only ready after its build and validation succeed.
 
 ## Help test the beta
 

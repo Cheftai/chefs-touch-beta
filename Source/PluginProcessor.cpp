@@ -1,4 +1,4 @@
-﻿#include "PluginProcessor.h"
+#include "PluginProcessor.h"
 #include "PluginEditor.h"
 
 namespace
@@ -94,6 +94,7 @@ ChefsTouchAudioProcessor::State::ParameterLayout ChefsTouchAudioProcessor::creat
     number("noiseFloor", "Noise Floor", -78, -28, 1, -52, "dB");
     choice("tuneStyle", "Tuning Style", {"Natural", "Hard Lock"}, 0);
     choice("delaySync", "Delay Sync", {"Free ms", "1/16", "1/8", "1/8 dotted", "1/4", "1/4 dotted", "1/2"}, 0);
+    layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("manualPitch",1),"Manual pitch timeline",false));
     layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("bypass", 1), "Bypass", false));
     layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("animation", 1), "Animate Chef", true,
         juce::AudioParameterBoolAttributes().withAutomatable(false)));
@@ -110,6 +111,7 @@ bool ChefsTouchAudioProcessor::isBusesLayoutSupported(const BusesLayout& layout)
 void ChefsTouchAudioProcessor::prepareToPlay(double rate, int)
 {
     processing.prepare(rate, getTotalNumInputChannels());
+    loudness.prepare(rate);
     setLatencySamples(processing.latency());
     reset();
 }
@@ -117,6 +119,8 @@ void ChefsTouchAudioProcessor::prepareToPlay(double rate, int)
 void ChefsTouchAudioProcessor::reset()
 {
     processing.reset();
+    loudness.reset();
+    lufsMomentary=lufsShortTerm=lufsIntegrated=-100;
     meterIn = meterL = meterR = detectedPitch = reduction = 0;
     mouthLevel = vocalConfidence = vocalCents = 0;
     meterFrame.fetch_add(1, std::memory_order_release);
@@ -139,22 +143,33 @@ void ChefsTouchAudioProcessor::render(juce::AudioBuffer<float>& audio, bool bypa
     const auto v = [&](size_t index) { return values[index]->load(std::memory_order_relaxed); };
     auto delayMs = v(16);
     double bpm = 0;
-    if (auto* playHead = getPlayHead())
-        if (const auto position = playHead->getPosition())
+    double timelineSeconds=-1;
+    if (auto* hostPlayHead = getPlayHead())
+        if (const auto position = hostPlayHead->getPosition())
+        {
+            if(const auto seconds=position->getTimeInSeconds()) timelineSeconds=*seconds;
             if (const auto tempo = position->getBpm(); tempo && std::isfinite(*tempo) && *tempo >= 20 && *tempo <= 400)
                 bpm = *tempo;
+        }
     const auto sync = static_cast<int>(state.getRawParameterValue("delaySync")->load(std::memory_order_relaxed));
     constexpr float beats[] { 0, .25f, .5f, .75f, 1, 1.5f, 2 };
     if (bpm > 0 && sync > 0 && sync < 7)
         delayMs = static_cast<float>(60000.0 / bpm) * beats[sync];
     hostTempo.store(static_cast<float>(bpm), std::memory_order_relaxed);
     syncedDelayMs.store(delayMs, std::memory_order_relaxed);
-    const kitchen::Controls controls {
+    kitchen::Controls controls {
         static_cast<int>(v(0)), static_cast<int>(v(1)), static_cast<int>(v(2)), static_cast<int>(v(3)),
         v(4),v(5),v(6),v(7),v(8),v(9),v(10),v(11),v(12),v(13),v(14),v(15),delayMs,v(17),v(18),v(19),v(20),
         v(22),v(23),v(24),v(25) >= 0.5f
     };
+    if(state.getRawParameterValue("manualPitch")->load()>=0.5f && timelineSeconds>=0)
+        controls.manualNote=pitchEdits.target(timelineSeconds);
     const auto result = processing.process(audio, controls, bypass);
+    if (resetLoudness.exchange(false, std::memory_order_relaxed)) loudness.reset();
+    loudness.process(audio);
+    lufsMomentary.store(loudness.momentary, std::memory_order_relaxed);
+    lufsShortTerm.store(loudness.shortTerm, std::memory_order_relaxed);
+    lufsIntegrated.store(loudness.integrated, std::memory_order_relaxed);
     const auto fall = std::exp(-static_cast<float>(audio.getNumSamples()) /
                                static_cast<float>(0.18 * getSampleRate()));
     const auto holdPeak = [fall](std::atomic<float>& dest, float peak)
@@ -219,6 +234,7 @@ void ChefsTouchAudioProcessor::getStateInformation(juce::MemoryBlock& data)
 {
     auto copy = state.copyState();
     copy.setProperty("preset", selectedPreset.load(), nullptr);
+    copy.setProperty("pitchEdits", getPitchEdits(), nullptr);
     if (const auto xml = copy.createXml())
         copyXmlToBinary(*xml, data);
 }
@@ -231,6 +247,7 @@ void ChefsTouchAudioProcessor::setStateInformation(const void* data, int bytes)
         const auto index = static_cast<int>(restored.getProperty("preset", -1));
         selectedPreset.store(juce::isPositiveAndBelow(index, presets().size()) ? index : -1);
         state.replaceState(restored);
+        setPitchEdits(restored.getProperty("pitchEdits").toString());
     }
 }
 
@@ -240,6 +257,7 @@ bool ChefsTouchAudioProcessor::restorePreset(const juce::MemoryBlock& data)
     if (xml == nullptr || !xml->hasTagName(state.state.getType()))
         return false;
     const auto incoming = juce::ValueTree::fromXml(*xml);
+    setPitchEdits(incoming.getProperty("pitchEdits").toString());
     for (auto* parameter : AudioProcessor::getParameters())
     {
         auto* ranged = dynamic_cast<juce::RangedAudioParameter*>(parameter);
@@ -261,6 +279,18 @@ bool ChefsTouchAudioProcessor::restorePreset(const juce::MemoryBlock& data)
 }
 
 juce::AudioProcessorEditor* ChefsTouchAudioProcessor::createEditor() { return new ChefsTouchEditor(*this); }
+juce::String ChefsTouchAudioProcessor::setPitchEdits(const juce::String& text)
+{
+    const juce::ScopedLock lock(pitchTextLock);
+    const auto error=pitchEdits.apply(text);
+    if(error.isEmpty()) pitchEditText=text;
+    return error;
+}
+juce::String ChefsTouchAudioProcessor::getPitchEdits() const
+{
+    const juce::ScopedLock lock(pitchTextLock);
+    return pitchEditText;
+}
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new ChefsTouchAudioProcessor; }
 
 

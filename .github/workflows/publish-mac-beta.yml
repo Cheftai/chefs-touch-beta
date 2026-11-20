@@ -15,11 +15,11 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.repository.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Attach validated AU ZIP to Beta 1
+      - name: Attach validated AU ZIP to Beta 2
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           BUILD_RUN: ${{ github.event.workflow_run.id }}
         run: |
           gh run download "$BUILD_RUN" --name Chefs-Touch-Logic-Pro-AU --dir mac-beta
-          gh release upload v0.3.0-beta.1 mac-beta/ChefsTouch-*-macOS-Universal-AU.zip --clobber
+          gh release upload v0.3.1-beta.2 mac-beta/ChefsTouch-*-macOS-Universal-AU.zip --clobber

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "PluginProcessor.h"
 #include "DSP/BeatAnalysis.h"
 
@@ -38,6 +38,12 @@ private:
     Theme theme;
     juce::ComboBox mode, presets, key, scale, quality, tuneStyle, delaySync;
     juce::TextButton settings { "Settings" }, learn { "Learn" };
+    juce::TextButton resetLufs { "Reset loudness" };
+    juce::TextButton pitchTimeline { "Manual pitch edits" }, applyPitch { "Apply note edits" };
+    juce::ToggleButton manualPitch { "Enable manual pitch timeline" };
+    juce::TextEditor pitchRows;
+    juce::Label pitchHelp, pitchStatus;
+    std::unique_ptr<ChefsTouchAudioProcessor::State::ButtonAttachment> manualPitchAttachment;
     juce::TextButton savePreset { "Save preset…" }, openPreset { "Open preset…" };
     juce::TextButton importBeat { "Analyze beat…" }, applyKey { "Use key" };
     juce::ToggleButton bypass { "Bypass" }, animate { "Animate chef" };

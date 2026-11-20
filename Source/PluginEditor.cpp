@@ -1,4 +1,4 @@
-﻿#include "PluginEditor.h"
+#include "PluginEditor.h"
 #include <BinaryData.h>
 
 namespace
@@ -101,6 +101,24 @@ ChefsTouchEditor::ChefsTouchEditor(ChefsTouchAudioProcessor& owner)
     bypassAttachment = std::make_unique<ChefsTouchAudioProcessor::State::ButtonAttachment>(processor.getParameters(), "bypass", bypass);
     animationAttachment = std::make_unique<ChefsTouchAudioProcessor::State::ButtonAttachment>(processor.getParameters(), "animation", animate);
     settings.onClick = [this] { selectPage(page == 1 ? 0 : 1); };
+    addAndMakeVisible(resetLufs);
+    resetLufs.onClick = [this] { processor.resetLoudness.store(true); };
+    for(auto* item:std::initializer_list<juce::Component*>{&pitchTimeline,&applyPitch,&manualPitch,&pitchRows,&pitchHelp,&pitchStatus})
+        addAndMakeVisible(item);
+    manualPitchAttachment=std::make_unique<ChefsTouchAudioProcessor::State::ButtonAttachment>(processor.getParameters(),"manualPitch",manualPitch);
+    pitchTimeline.onClick=[this] { pitchRows.setText(processor.getPitchEdits()); selectPage(3); };
+    applyPitch.onClick=[this]
+    {
+        const auto error=processor.setPitchEdits(pitchRows.getText());
+        pitchStatus.setText(error.isEmpty() ? "Saved. Enable timeline and play the vocal from your DAW." : error,juce::dontSendNotification);
+    };
+    pitchRows.setMultiLine(true,true);
+    pitchRows.setReturnKeyStartsNewLine(true);
+    pitchRows.setColour(juce::TextEditor::backgroundColourId,ink);
+    pitchRows.setColour(juce::TextEditor::textColourId,paper);
+    pitchRows.setTextToShowWhenEmpty("0.0, 1.0, 69\n1.0, 2.0, 71",soft);
+    labelStyle(pitchHelp,"Rows: start seconds, end seconds, MIDI note (60=C4, 69=A4). DAW timeline; Vocal only. Max shift 12 semitones.",13,soft);
+    labelStyle(pitchStatus,"Edit up to 64 ordered regions. Tune Amount and Retune still apply. Settings returns to the settings page.",12,gold);
     learn.onClick = [this] { selectPage(page == 2 ? 0 : 2); };
     animate.onClick = [this] { repaint(stage); };
     savePreset.onClick = [this] { choosePresetFile(true); };
@@ -204,7 +222,7 @@ void ChefsTouchEditor::resized()
     bypass.setBounds(nav.removeFromLeft(78));
     layout.removeFromTop(13);
     stage = layout.removeFromLeft(juce::roundToInt(static_cast<float>(layout.getWidth())*0.34f));
-    meterBox = stage.withTrimmedTop(stage.getHeight()-106).reduced(14, 5);
+    meterBox = stage.withTrimmedTop(stage.getHeight()-150).reduced(14, 5);
     layout.removeFromLeft(13);
     controls = layout;
     auto inside = controls.reduced(16);
@@ -235,6 +253,10 @@ void ChefsTouchEditor::resized()
     qualityLabel.setVisible(page == 1);
     quality.setVisible(page == 1);
     animate.setVisible(page == 1);
+    resetLufs.setVisible(page == 1);
+    pitchTimeline.setVisible(page==1);
+    for(auto* item:std::initializer_list<juce::Component*>{&applyPitch,&manualPitch,&pitchRows,&pitchHelp,&pitchStatus})
+        item->setVisible(page==3);
     delaySync.setVisible(page == 1);
     latencyLabel.setVisible(page == 1);
     savePreset.setVisible(page == 1);
@@ -249,12 +271,23 @@ void ChefsTouchEditor::resized()
         qualityLabel.setBounds(row.removeFromLeft(165));
         quality.setBounds(row.removeFromLeft(145).reduced(2));
         animate.setBounds(inside.removeFromTop(36));
+        resetLufs.setBounds(inside.removeFromTop(32).removeFromLeft(180).reduced(2));
+        pitchTimeline.setBounds(inside.removeFromTop(32).removeFromLeft(180).reduced(2));
         delaySync.setBounds(inside.removeFromTop(32).removeFromLeft(180).reduced(2));
         latencyLabel.setBounds(inside.removeFromTop(36));
         auto files = inside.removeFromTop(38);
         savePreset.setBounds(files.removeFromLeft(134).reduced(3));
         openPreset.setBounds(files.removeFromLeft(134).reduced(3));
         presetStatus.setBounds(inside.removeFromTop(36));
+    }
+    else if (page == 3)
+    {
+        subheading.setText("Manual pitch timeline",juce::dontSendNotification);
+        manualPitch.setBounds(inside.removeFromTop(32));
+        pitchHelp.setBounds(inside.removeFromTop(52));
+        pitchStatus.setBounds(inside.removeFromBottom(52));
+        applyPitch.setBounds(inside.removeFromBottom(36).removeFromLeft(160));
+        pitchRows.setBounds(inside.reduced(2,6));
     }
     else if (page == 2)
     {
@@ -476,6 +509,12 @@ void ChefsTouchEditor::drawMeters(juce::Graphics& g)
     g.drawText(lastMode == 0 ? pitchText : "Master output",
                info, juce::Justification::centredLeft);
     g.drawText("GR  " + juce::String(gr, 1) + " dB", info, juce::Justification::centredRight);
+    const auto format = [](float v) { return v <= -99 ? juce::String("--") : juce::String(v, 1); };
+    g.setColour(gold);
+    g.drawText("LUFS M " + format(processor.lufsMomentary.load()) + "  S "
+        + format(processor.lufsShortTerm.load()), region.removeFromTop(20), juce::Justification::centredLeft);
+    g.drawText("Integrated " + format(processor.lufsIntegrated.load()) + " LUFS",
+        region.removeFromTop(20), juce::Justification::centredLeft);
 }
 
 void ChefsTouchEditor::updateCoach()

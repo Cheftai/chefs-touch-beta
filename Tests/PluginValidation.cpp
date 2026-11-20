@@ -1,5 +1,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../Source/DSP/BeatAnalysis.h"
+#include "../Source/DSP/Loudness.h"
+#include "../Source/DSP/PitchEdits.h"
+#include "../Source/DSP/Processing.h"
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -194,6 +197,37 @@ int main(int argc, char** argv)
     juce::ScopedJuceInitialiser_GUI juceInit;
     try
     {
+        kitchen::PitchEdits edits;
+        require(edits.apply("0,1,69\n1,2,71").isEmpty(),"Valid manual pitch timeline rejected");
+        require(edits.target(0)==69 && edits.target(0.999)==69 && edits.target(1)==71
+            && edits.target(2)==-1,"Manual note boundaries incorrect");
+        require(edits.apply("0,1,nope").isNotEmpty() && edits.target(0)==69,"Bad pitch data changed saved notes");
+        require(edits.apply("0,2,69\n1,3,71").isNotEmpty(),"Overlapping note edits accepted");
+        require(edits.apply("").isEmpty() && edits.target(0)==-1,"Clearing pitch edits failed");
+        for (const double loudnessRate : { 44100.0, 48000.0, 96000.0 })
+        {
+            kitchen::Loudness meter;
+            meter.prepare(loudnessRate);
+            juce::AudioBuffer<float> signal(1, 257);
+            int position=0;
+            while (position < static_cast<int>(4*loudnessRate))
+            {
+                for (int i=0;i<signal.getNumSamples();++i)
+                    signal.setSample(0,i,0.1f*static_cast<float>(std::sin(
+                        juce::MathConstants<double>::twoPi*1000*(position+i)/loudnessRate)));
+                meter.process(signal);
+                position+=signal.getNumSamples();
+            }
+            require(std::abs(meter.integrated+23.0f)<0.2f, "1 kHz reference loudness mismatch");
+            require(std::abs(meter.shortTerm-meter.momentary)<0.1f, "Loudness windows disagree on steady tone");
+            const auto beforeSilence=meter.integrated;
+            signal.clear();
+            for(int i=0;i<2000;++i) meter.process(signal);
+            require(meter.momentary < -90, "Silence did not clear momentary LUFS");
+            require(std::abs(meter.integrated-beforeSilence)<0.3f, "Integrated gate included sustained silence");
+            meter.reset();
+            require(meter.integrated == -100, "Loudness reset failed");
+        }
         require(argc == 2, "Expected a VST3 or installed Audio Unit bundle path");
         const auto bundle = juce::String::fromUTF8(argv[1]);
         std::unique_ptr<juce::AudioPluginFormat> format;
@@ -241,6 +275,32 @@ int main(int argc, char** argv)
         require(std::abs(locked-440) + 2 < std::abs(natural-440), "Hard Lock did not strengthen correction");
         set(*plugin, "Tuning Style", 0);
         set(*plugin, "Humanize", 0);
+        kitchen::Processing manualProcessing;
+        manualProcessing.prepare(rate,2);
+        kitchen::Controls manualControls {};
+        manualControls.quality=1; manualControls.retune=3; manualControls.ratio=1;
+        manualControls.mix=1; manualControls.width=1; manualControls.ceiling=-1;
+        manualControls.tune=1; manualControls.manualNote=69; manualControls.time=260;
+        juce::AudioBuffer<float> manualAudio(2,257);
+        int crossings=0; double firstCrossing=0,lastCrossing=0; float previousSample=0;
+        for(int pos=0;pos<static_cast<int>(1.5*rate);pos+=257)
+        {
+            for(int ch=0;ch<2;++ch) for(int i=0;i<257;++i)
+                manualAudio.setSample(ch,i,0.3f*tone(400,pos+i));
+            manualProcessing.process(manualAudio,manualControls,false);
+            for(int i=0;i<257;++i)
+            {
+                const auto x=manualAudio.getSample(0,i);
+                if(pos+i>rate/2 && previousSample<0 && x>=0)
+                {
+                    lastCrossing=pos+i-1-previousSample/(x-previousSample);
+                    if(++crossings==1) firstCrossing=lastCrossing;
+                }
+                previousSample=x;
+            }
+        }
+        require(crossings>2 && std::abs((crossings-1)*rate/(lastCrossing-firstCrossing)-440)<4,
+                "Manual target did not retune the audio to A4");
         checkVocalEffects(*plugin, latency);
         checkBeatAnalysis();
         set(*plugin, "Tune Amount", 0);

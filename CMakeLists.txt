@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-project(ChefsTouch VERSION 0.3.0 LANGUAGES C CXX)
+project(ChefsTouch VERSION 0.3.1 LANGUAGES C CXX)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/JUCE/CMakeLists.txt")
     add_subdirectory(third_party/JUCE)
@@ -69,7 +69,7 @@ option(CHEFS_TOUCH_BUILD_TESTS "Build the plug-in host smoke tests" OFF)
 if(CHEFS_TOUCH_BUILD_TESTS)
     enable_testing()
     juce_add_console_app(ChefsTouchValidation PRODUCT_NAME "Chefs Touch Validation")
-    target_sources(ChefsTouchValidation PRIVATE Tests/PluginValidation.cpp Source/DSP/BeatAnalysis.cpp)
+    target_sources(ChefsTouchValidation PRIVATE Tests/PluginValidation.cpp Source/DSP/BeatAnalysis.cpp Source/DSP/Processing.cpp)
     target_compile_features(ChefsTouchValidation PRIVATE cxx_std_20)
     target_compile_definitions(ChefsTouchValidation PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
@@ -87,7 +87,7 @@ if(CHEFS_TOUCH_BUILD_TESTS)
     endif()
     if(TARGET ChefsTouch_AU)
         target_compile_definitions(ChefsTouchValidation PRIVATE JUCE_PLUGINHOST_AU=1)
-        target_link_libraries(ChefsTouchValidation PRIVATE "-framework AudioUnit")
+        target_link_libraries(ChefsTouchValidation PRIVATE "-framework AudioUnit" "-framework CoreAudioKit")
         add_dependencies(ChefsTouchValidation ChefsTouch_AU)
     endif()
 endif()

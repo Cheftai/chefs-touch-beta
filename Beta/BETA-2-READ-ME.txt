@@ -1,0 +1,42 @@
+CHEF'S TOUCH 0.3.1 - BETA 2
+
+NEW IN BOTH PLUGIN FORMATS
+Manual note timeline: Settings > Manual pitch edits. Enter up to 64 rows:
+start seconds, end seconds, MIDI note
+Example:
+0, 1, 69
+1, 2, 71
+Press Apply note edits and enable the timeline. A4=69, C4=60.
+Regions follow the DAW's song timeline in seconds, not time since pressing
+Play. Rows must be ordered and cannot overlap. Targets allow MIDI 36-84;
+shifts are capped at 12 semitones. Tune Amount, Humanize and Retune apply.
+Outside regions, normal scale correction applies. Vocal mode only.
+The host must provide timeline seconds. Edits are saved with plugin state
+and user presets. This is a numeric region editor, not a graphical piano roll.
+Region timing has audio-block and pitch-analysis resolution.
+
+LUFS: output momentary (400 ms), short-term (3 s), gated integrated.
+Reset in Settings before measuring a song. Silence displays --.
+The integrated relative gate uses 0.1-LU bins. Mono/stereo only.
+This meter is intended for mixing; it is not broadcast certified.
+
+STEM SEPARATION - WINDOWS COMPANION
+Run Separate-Stems-Windows.cmd, choose a WAV song and wait.
+First run downloads Python, CPU PyTorch, Demucs and model weights to
+Windows. This requires substantial Windows disk space and internet.
+Audio is processed locally. Outputs: vocals, drums, bass and other WAVs.
+Transfer those WAVs to Mac and import all at the same DAW start position.
+No model or Python is installed on the Mac. Separation is an offline
+companion workflow, not real-time processing inside either plugin.
+The launcher syntax is checked; end-to-end model inference has not yet
+been verified in this workspace. Separation can contain bleed/artifacts.
+
+INSTALLATION
+Windows: copy the entire Chefs Touch.vst3 folder to
+C:\Program Files\Common Files\VST3 and rescan your DAW.
+Mac: only use the AU ZIP after its remote build and validation pass.
+Copy Chefs Touch.component to ~/Library/Audio/Plug-Ins/Components.
+
+Still absent: signed installers, Apple notarization, automatic updates,
+and runtime tester activation. The 25-person usage limit is not enforced.
+Existing Beta 1 features and 22 presets remain included.

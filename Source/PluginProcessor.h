@@ -3,6 +3,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "DSP/Processing.h"
+#include "DSP/Loudness.h"
+#include "DSP/PitchEdits.h"
 
 class ChefsTouchAudioProcessor final : public juce::AudioProcessor
 {
@@ -55,6 +57,8 @@ public:
     juce::AudioProcessorParameter* getBypassParameter() const override;
     static const juce::StringArray& presets();
     void loadPreset(int index);
+    juce::String setPitchEdits(const juce::String&);
+    juce::String getPitchEdits() const;
 
     State& getParameters() { return state; }
     static State::ParameterLayout createParameterLayout();
@@ -64,11 +68,17 @@ public:
     std::atomic<unsigned> meterFrame {};
     std::atomic<float> mouthLevel {}, vocalConfidence {}, vocalCents {};
     std::atomic<float> hostTempo {}, syncedDelayMs {};
+    std::atomic<float> lufsMomentary {-100}, lufsShortTerm {-100}, lufsIntegrated {-100};
+    std::atomic<bool> resetLoudness {};
 
 private:
     State state;
     void render(juce::AudioBuffer<float>&, bool);
     kitchen::Processing processing;
+    kitchen::Loudness loudness;
+    kitchen::PitchEdits pitchEdits;
+    mutable juce::CriticalSection pitchTextLock;
+    juce::String pitchEditText;
     std::array<const std::atomic<float>*, 26> values {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(

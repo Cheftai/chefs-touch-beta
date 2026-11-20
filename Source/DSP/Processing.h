@@ -11,6 +11,7 @@ struct Controls
     float input, output, retune, human, low, mid, high, threshold, ratio,
           deess, room, echo, time, drive, mix, width, ceiling, tune, denoise, noiseFloor;
     bool hardLock;
+    int manualNote = -1;
 };
 
 struct Meter

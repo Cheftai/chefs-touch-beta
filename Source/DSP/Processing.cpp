@@ -207,7 +207,12 @@ float Processing::correction(const Controls& p)
     }
     const auto previousDistance = static_cast<float>(lockedNote)-note;
     const auto hysteresis = p.hardLock ? 0.04f+0.12f*p.human : 0.08f+0.24f*p.human;
-    if (lockedNote >= 0 && std::abs(previousDistance) <= std::abs(distance)+hysteresis)
+    if (p.manualNote >= 0)
+    {
+        distance=juce::jlimit(-12.0f,12.0f,static_cast<float>(p.manualNote)-note);
+        lockedNote=-1;
+    }
+    else if (lockedNote >= 0 && std::abs(previousDistance) <= std::abs(distance)+hysteresis)
         distance = previousDistance;
     else
         lockedNote = target;
