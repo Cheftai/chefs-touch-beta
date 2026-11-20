@@ -1,0 +1,41 @@
+name: Build Logic Pro Audio Unit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - CMakeLists.txt
+      - 'Source/**'
+      - 'Assets/**'
+      - 'Tests/**'
+      - 'Scripts/**'
+      - '.github/workflows/logic-au.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  logic-au:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build, install and validate universal Audio Unit
+        run: bash Scripts/build-macos.sh --install
+      - name: Upload Logic Pro download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chefs-Touch-Logic-Pro-AU
+          path: Build/macos/ChefsTouch-*-macOS-Universal-AU.zip
+          if-no-files-found: error
+      - name: Upload Audio Unit validation log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auval-log
+          path: Build/macos/auval.log
+          if-no-files-found: ignore
+
