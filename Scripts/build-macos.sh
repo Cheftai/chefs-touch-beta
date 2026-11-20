@@ -34,7 +34,7 @@ test_host="$build/ChefsTouchValidation_artefacts/Release/ChefsTouchValidation"
 plist="$bundle/Contents/Info.plist"
 executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$plist")"
 version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")"
-xcrun lipo -verify_arch arm64 x86_64 "$bundle/Contents/MacOS/$executable"
+xcrun lipo "$bundle/Contents/MacOS/$executable" -verify_arch arm64 x86_64
 /usr/bin/codesign --force --sign - "$bundle"
 /usr/bin/codesign --verify --strict "$bundle"
 
