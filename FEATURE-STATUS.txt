@@ -1,18 +1,20 @@
-REQUESTED NEXT FEATURES - STATUS
+﻿BETA 2 FEATURE STATUS
 
-Tempo-synced delay: implemented; Windows build and existing host tests passed. Host-specific tempo behavior still needs DAW testing.
-Manual pitch timeline/editor: not implemented.
-Stem separation: not implemented; requires separation engine/model and
-an offline import/export workflow, plus model licensing review.
-LUFS metering: not implemented.
-Signed installers: blocked by missing signing certificates.
-Apple notarization: blocked by missing Apple Developer membership.
-Automatic updates: not implemented; requires published release hosting,
-verification of downloaded packages and an installer/update strategy.
-25-user runtime activation: not implemented; requires tester identities,
-license signing keys and an activation/revocation design.
-Private GitHub collaboration limits access to downloads, not copied binaries.
+Available in the tested Windows 0.3.1 Beta 2:
+- Numeric manual pitch timeline, 64 regions; not a graphical piano roll.
+- Momentary, short-term and gated integrated output LUFS, reset control.
+- Windows offline stem companion; synthetic-audio inference test passed.
+- All previous Beta 1 processing, presets and UI features.
 
-Do not advertise these requested features as included in Beta 1.
-Do not advertise Mac support as tested until the Mac workflow passes.
+Shared source includes pitch edits and LUFS for the Mac AU.
+Mac release requires remote compilation, signing checks, Apple auval and
+plugin host tests. The current Mac build is still pending validation.
+The workflow attaches the AU ZIP to the Beta 2 release only after passing.
 
+Stem processing runs on Windows. Transfer the four finished WAVs to Mac.
+There is no in-plugin realtime AI separation engine and no Mac AI install.
+
+Still absent: graphical piano-roll editor, signed retail installers,
+Apple notarization, automatic updates, and enforced 25-person activation.
+Private GitHub access restricts downloads, not copied plugin execution.
+Musical separation quality and cross-DAW listening tests remain necessary.
