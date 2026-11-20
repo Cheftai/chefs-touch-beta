@@ -28,8 +28,8 @@ Audio is processed locally. Outputs: vocals, drums, bass and other WAVs.
 Transfer those WAVs to Mac and import all at the same DAW start position.
 No model or Python is installed on the Mac. Separation is an offline
 companion workflow, not real-time processing inside either plugin.
-The launcher syntax is checked; end-to-end model inference has not yet
-been verified in this workspace. Separation can contain bleed/artifacts.
+The launcher and end-to-end CPU inference passed a synthetic-audio test;
+all four outputs had aligned frames, stereo channels and the correct sample rate. Separation can contain bleed/artifacts.
 
 INSTALLATION
 Windows: copy the entire Chefs Touch.vst3 folder to
