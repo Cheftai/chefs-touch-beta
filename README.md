@@ -1,59 +1,60 @@
-# Chef's Touch
+﻿# Chef's Touch — Beta 1
 
-A JUCE effect for vocal tuning and mixing, or stereo mastering. The Windows build is a 64-bit VST3. The same project enables an Audio Unit effect target on macOS.
+Vocal processing and stereo mastering in one plugin, with 22 factory presets and a chef mascot that reacts to your vocal.
 
-## Use it in a mix
+**[Download Beta 1](https://github.com/Cheftai/chefs-touch-beta/releases/tag/v0.3.0-beta.1)** · **[Mac build status](https://github.com/Cheftai/chefs-touch-beta/actions)** · **[Report a bug](https://github.com/Cheftai/chefs-touch-beta/issues)**
 
-- **Vocal** works with an isolated, monophonic performance. Pick the song's Key and Scale, then shape the correction with Retune, Tune Amount and Humanize. Chromatic mode can target any semitone. For an obvious hard-tune effect, select Hard Lock, use a short Retune, high Tune Amount, low Humanize and the song's scale. Hard Lock applies a shorter retune time constant than Natural at the same setting. The chain includes input trim, pitch correction, noise cleanup, three-band EQ, compression, de-essing, saturation, delay and reverb. Wet / Dry blends the processed signal with latency-aligned dry audio, and Output trims the blend.
-- **Analyze beat** estimates the BPM and major or minor key from the first minute of a locally selected instrumental audio file. **Use key** writes the detected key and scale to the Vocal parameters saved in the DAW project. BPM is a reference for the user. Tempo estimates can land at half or double time, and closely scored keys are marked **check**.
-- **Noise Clean** applies a rumble filter and three-band downward expansion. Start with Noise Floor below the quietest sung words. Raise it until the noise drops in pauses, then use Noise Clean to blend the result. Quiet fan or room noise and rumble can be reduced. Loud bleed or noise occupying the same frequencies as the singer can remain.
-- **Master** includes input trim, three-band EQ, compression, saturation, mid/side width, output trim and a linked lookahead limiter. Width at 0x sums the output to mono and 1x preserves the input side level. The limiter estimates inter-sample peaks with 4x interpolation in Standard and 8x in High. Its ceiling is an estimate and has not been certified against a broadcast true-peak test suite.
-- **Settings** shows reported latency, switches processing quality, toggles mascot animation, and opens and saves reusable `.chefpreset` files. Factory presets cover both modes. FL Studio project state stores parameter values and the selected factory preset.
-- **Learn** gives step-by-step starting values, knob adjustments, and listening checks for tuning, noise cleanup, EQ, dynamics, space, and mastering. Live feedback is calculated locally.
-- The chef opens and closes his mouth with the isolated vocal level. A well-tracked note within 12 cents of the selected scale target for about half a second cues the sauce pour and pan flare. This is a pitch milestone.
+## Downloads and compatibility
 
-Both modes report 25 ms of latency, rounded up to a whole sample. Bypass keeps the same delay for host delay compensation. Vocal correction targets an isolated voice in roughly the 65–950 Hz analysis range.
+| Platform | Format | Status |
+| --- | --- | --- |
+| Windows 64-bit | VST3 | Available in the Beta 1 release; compilation and existing host tests passed |
+| Mac M1 and other Apple silicon; Intel | Audio Unit, macOS 12+ | Remote build and validation in progress; download pending |
 
-## Windows build and validation
+This is a private beta. Testers must be invited to this repository and accept the invitation before accessing downloads. The intended first cohort is 25 people. **Plugin activation does not currently enforce a 25-person limit.**
 
-Run the following in PowerShell from the project root. The build uses the vendored JUCE checkout and keeps generated files under `Build/windows`.
+## Install on Windows
+
+1. Open the Beta 1 release and download `ChefsTouch-0.3.0-beta.1-Windows-VST3.zip`.
+2. Extract it and copy the entire `Chefs Touch.vst3` folder to `C:\Program Files\Common Files\VST3`.
+3. Rescan plugins in your DAW and load Chef's Touch as an effect on a vocal or master track.
+
+## Install on an M1 Mac with limited storage
+
+Wait for a validated Mac AU download to appear in the release. Download and extract that ZIP, then move `Chefs Touch.component` into `~/Library/Audio/Plug-Ins/Components` with your DAW closed. Create the folder if necessary, restart the DAW and rescan plugins. Delete the downloaded ZIP after installation.
+
+**You do not need Xcode, JUCE, CMake or this source repository on your Mac.** GitHub builds the plugin remotely. The intended Mac build includes native arm64 and Intel support. It is ad-hoc signed; Apple notarization is not included.
+
+## Included in this beta
+
+- **22 factory presets:** Vocal and Master recipes for Trap, Pop, Rock, R&B, Hip Hop, Acoustic, EDM and Jazz Soul, plus six original recipes. Presets are starting points; choose the song's actual key and scale and adjust levels for your recording.
+- **Vocal chain:** Natural and Hard Lock pitch correction, key and scale selection, retune, humanize, tune amount, rumble filtering, three-band noise expansion, three-band EQ, compression, de-essing, saturation, delay and reverb.
+- **DAW tempo delay:** In Settings, select Delay Sync from 1/16 through 1/2 notes, including dotted eighth and quarter notes. When the host supplies no valid tempo, the manual Delay time is used. Host-specific tempo behavior still needs DAW testing.
+- **Master chain:** EQ, compression, saturation, stereo width and linked lookahead limiting with estimated inter-sample peak detection.
+- **Controls and feedback:** Input/output gain, vocal wet/dry, input/output and gain reduction meters, pitch readout, bypass with latency compensation, Standard/High quality, preset save/load and DAW state recall.
+- **Beat analysis and coaching:** Import an instrumental to estimate BPM and major/minor key, apply its key to the vocal settings, and use the local mix coach for adjustment guidance.
+- **Interface:** Drawn kitchen tiles, gold trim, decorative flame border, vocal-level mouth animation and an in-tune chef celebration. The mouth does not recognize lyrics or phonemes.
+
+Both processing modes report approximately 25 ms latency. Vocal pitch correction expects an isolated, monophonic voice. Noise cleanup reduces noise in pauses; it does not separate a voice from a full mix. The limiter's estimated peak ceiling is not broadcast-certified.
+
+## Requested features still to come
+
+Manual pitch editing, stem separation, LUFS metering, signed installers, Apple notarization, automatic updates and enforced tester activation are **not included**. No AAX or standalone application is included. A Mac download is only ready after its build and validation succeed.
+
+## Help test the beta
+
+Use a duplicate project. Check plugin loading, resizing, automation, save/reopen, bypass timing, mono/stereo operation, quiet passages, loud choruses and CPU use. Cross-DAW listening evaluation is still needed.
+
+[Open an issue](https://github.com/Cheftai/chefs-touch-beta/issues/new) with your OS, CPU, DAW and version, sample rate, buffer size, preset, steps to reproduce, expected result and actual result. Attach a screenshot or short audio example if useful. See [the beta readme](Beta/BETA-READ-ME.txt) for additional details.
+
+## Build from source
+
+CMake uses the vendored JUCE checkout when present, otherwise it downloads the pinned JUCE revision. Source builds require CMake 3.22+, a C++20 toolchain and the platform SDK. This is only for development; testers should use the release downloads.
 
 ```powershell
-$vs = & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath
-$bin = Join-Path $vs "Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin"
-New-Item -ItemType Directory -Path Build/temp -Force | Out-Null
-$env:TEMP = (Resolve-Path Build/temp).Path
-$env:TMP = $env:TEMP
-
-& "$bin/cmake.exe" -S . -B Build/windows -G "Visual Studio 18 2026" -A x64 -DCHEFS_TOUCH_BUILD_TESTS=ON
-& "$bin/cmake.exe" --build Build/windows --config Release --target ChefsTouchValidation --parallel
-& "$bin/ctest.exe" --test-dir Build/windows -C Release --output-on-failure
+cmake -S . -B Build/windows -DCHEFS_TOUCH_BUILD_TESTS=ON
+cmake --build Build/windows --config Release --target ChefsTouchValidation --parallel
+ctest --test-dir Build/windows -C Release --output-on-failure
 ```
 
-The bundle is `Build/windows/ChefsTouch_artefacts/Release/VST3/Chefs Touch.vst3`. The file name omits the apostrophe for MSBuild compatibility. The host displays **Chef's Touch**. Install the entire bundle in `C:\Program Files\Common Files\VST3`. In FL Studio, open **Options → Manage plugins**, enable **Verify plugins**, then select **Find installed plugins**. Load it in an FX slot on your vocal insert or master mixer track.
-
-The smoke test opens the released bundle through a JUCE VST3 host. It exercises pitch correction, Vocal effects and noise cleanup, Master limiting and width, mono and stereo layouts, automation, latency, bypass, state recall and editor creation. A generated instrumental fixture checks BPM and key analysis.
-
-## macOS build and Logic Pro
-
-To save disk space, download **Chefs-Touch-Logic-Pro-AU** from the most recent successful **Build Logic Pro Audio Unit** workflow run. Extract the inner AU ZIP, then copy `Chefs Touch.component` to `~/Library/Audio/Plug-Ins/Components` with Logic closed. You only need the component on your Mac.
-
-Copy the source tree or extract the Mac source archive on a Mac with full Xcode and CMake 3.22 or newer. Close Logic Pro before replacing an installed component. From the extracted directory, run:
-
-```sh
-bash Scripts/build-macos.sh --install
-```
-
-The script builds the AU effect for Apple silicon and Intel, checks both architectures, and ad-hoc signs the bundle for local use. With `--install`, it installs under `~/Library/Audio/Plug-Ins/Components`, runs `auval -v aufx CfTc ChTi`, and tests the installed component in the JUCE host. A failed validation restores the previous component if present. Omit `--install` to build and package without touching the Mac's Components directory.
-
-The component is written to `Build/macos/ChefsTouch_artefacts/Release/AU/Chefs Touch.component`. The packaged ZIP is `Build/macos/ChefsTouch-0.3.0-macOS-Universal-AU.zip`. The build targets macOS 12 or later. Each version of Logic Pro has its own macOS requirement. The ZIP is ad-hoc signed for development. A retail build needs Developer ID signing and notarization.
-
-In Logic Pro, add the effect from **Audio FX → Audio Units → Chef Tai → Chef's Touch**. If it is listed but unavailable, open **Logic Pro → Settings → Plug-in Manager**, select Chef's Touch, and choose **Reset & Rescan Selection**. [Apple's Plug-in Manager guide](https://support.apple.com/guide/logicpro/lgcp9e26ef17/mac)
-
-## Source layout
-
-- `Source/PluginProcessor.*` owns automation, factory presets and serialized state.
-- `Source/DSP/Processing.*` owns audio processing and preallocated delay and analysis buffers.
-- `Source/PluginEditor.*` owns the controls, meters, coach and animation. A JUCE message-thread timer reads atomic audio measurements.
-- `Assets/Images` contains the embedded original cartoon poses. See [art generation notes](Assets/Images/Art.md).
-
+On a Mac with Xcode and CMake, `bash Scripts/build-macos.sh --install` builds and validates the universal AU. The GitHub Actions workflow runs this remotely for the low-storage installation path.
